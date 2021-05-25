@@ -9,8 +9,6 @@
 
 int main()
 {
-	int captureId = 0;
-	int playbackId = 0;
 	int txProtocol = GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
 
 	ultrasonic::Ultrasonic ultrasonic;

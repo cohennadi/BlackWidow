@@ -9,10 +9,8 @@
 #include <iostream>
 
 
-int main(int argc, char** argv) {
-	
-    int captureId = 0;
-    int playbackId = 0;
+int main(int argc, char** argv)
+{
     int txProtocol =  GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
 
 
