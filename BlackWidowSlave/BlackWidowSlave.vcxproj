@@ -24,6 +24,7 @@
     <ProjectGuid>{970ab5cb-739f-4a93-8957-6e84b71dca64}</ProjectGuid>
     <RootNamespace>BlackWidowSlave</RootNamespace>
     <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+    <ProjectName>TestListener</ProjectName>
   </PropertyGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
@@ -147,10 +148,6 @@
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClInclude Include="BlackWidowC2.h" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="BlackWidowC2.cpp" />
     <ClCompile Include="BlackWidowSlave.cpp" />
   </ItemGroup>
   <ItemGroup>

@@ -13,23 +13,8 @@ int main(int argc, char** argv)
 {
     int txProtocol =  GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
 
-
     ultrasonic::Ultrasonic ultrasonic;
-
     auto ggWave = ultrasonic.get_ggwave(); 
-
-    printf("Available Tx protocols:\n");
-    const auto& protocols = GGWave::getTxProtocols();
-    for (const auto& protocol : protocols) {
-        printf("    -t%d : %s\n", protocol.first, protocol.second.name);
-    }
-
-    if (txProtocol < 0 || txProtocol >(int) ggWave->getTxProtocols().size()) {
-        fprintf(stderr, "Unknown Tx protocol %d\n", txProtocol);
-        return -3;
-    }
-
-    printf("Selecting Tx protocol %d\n", txProtocol);
 
     std::mutex mutex;
     std::thread inputThread([&]() {
