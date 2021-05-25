@@ -1,32 +1,23 @@
-#include "ggwave-common-sdl2.h"
-#include "ggwave-common.h"
+#include "Ultrasonic.h"
 
 #include <ggwave/ggwave.h>
-
 #include <cstdio>
 #include <string>
 #include <mutex>
 #include <thread>
 #include <iostream>
 
+
 int main(int argc, char** argv) {
-    printf("Usage: %s [-cN] [-pN] [-tN]\n", argv[0]);
-    printf("    -cN - select capture device N\n");
-    printf("    -pN - select playback device N\n");
-    printf("    -tN - transmission protocol\n");
-    printf("\n");
+	
+    int captureId = 0;
+    int playbackId = 0;
+    int txProtocol =  GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
 
-    auto argm = parseCmdArguments(argc, argv);
-    int captureId = argm["c"].empty() ? 0 : std::stoi(argm["c"]);
-    int playbackId = argm["p"].empty() ? 0 : std::stoi(argm["p"]);
-    int txProtocol = argm["t"].empty() ? 1 : std::stoi(argm["t"]);
 
-    if (GGWave_init(playbackId, captureId) == false) {
-        fprintf(stderr, "Failed to initialize GGWave\n");
-        return -1;
-    }
+    ultrasonic::Ultrasonic ultrasonic;
 
-    auto ggWave = GGWave_instance();
+    auto ggWave = ultrasonic.get_ggwave(); 
 
     printf("Available Tx protocols:\n");
     const auto& protocols = GGWave::getTxProtocols();
@@ -57,7 +48,7 @@ int main(int argc, char** argv) {
             }
             {
                 std::lock_guard<std::mutex> lock(mutex);
-                ggWave->init(input.size(), input.data(), ggWave->getTxProtocol(txProtocol), 10);
+                ggWave->init(input.size(), input.data(), ggWave->getTxProtocol(txProtocol), 70);
             }
             inputOld = input;
         }
@@ -68,13 +59,11 @@ int main(int argc, char** argv) {
         std::this_thread::sleep_for(std::chrono::milliseconds(1));
         {
             std::lock_guard<std::mutex> lock(mutex);
-            GGWave_mainLoop();
+            ultrasonic.run_logic();
         }
     }
 
     inputThread.join();
-
-    GGWave_deinit();
 
     return 0;
 }

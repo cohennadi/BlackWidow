@@ -1,2 +1,6 @@
+#pragma once
 
-void sendArtifact(const char* rawArtifact);
+#include <string>
+
+
+void sendArtifact(const std::string& rawArtifact);

@@ -172,12 +172,13 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
-    <ClCompile Include="ggwave-common-sdl2.cpp" />
     <ClCompile Include="ggwave-common.cpp" />
+    <ClCompile Include="Ultrasonic.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="ggwave-common-sdl2.h" />
+    <ClInclude Include="Defines.h" />
     <ClInclude Include="ggwave-common.h" />
+    <ClInclude Include="Ultrasonic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
