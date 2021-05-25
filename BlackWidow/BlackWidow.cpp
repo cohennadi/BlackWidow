@@ -1,4 +1,5 @@
 #include "Ultrasonic.h"
+#undef main
 
 #include <ggwave/ggwave.h>
 #include <cstdio>
