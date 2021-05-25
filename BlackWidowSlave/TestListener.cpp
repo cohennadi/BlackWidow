@@ -8,8 +8,6 @@
 
 int main()
 {
-	int txProtocol = GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
-
 	ultrasonic::Ultrasonic ultrasonic;
 	auto ggWave = ultrasonic.get_ggwave(); 
 
