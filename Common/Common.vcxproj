@@ -175,14 +175,14 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="AudioDevice.cpp" />
-    <ClCompile Include="ggwave-common.cpp" />
+    <ClCompile Include="utils.cpp" />
     <ClCompile Include="SdlWrapper.cpp" />
     <ClCompile Include="Ultrasonic.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="AudioDevice.h" />
     <ClInclude Include="Defines.h" />
-    <ClInclude Include="ggwave-common.h" />
+    <ClInclude Include="utils.h" />
     <ClInclude Include="SdlWrapper.h" />
     <ClInclude Include="Ultrasonic.h" />
   </ItemGroup>

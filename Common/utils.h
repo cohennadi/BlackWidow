@@ -1,11 +1,7 @@
 #pragma once
 
 #include <chrono>
-#include <string>
-#include <map>
 #include <vector>
-
-// some basic helper methods for the examples
 
 template <class T>
 float getTime_ms(const T & tStart, const T & tEnd) {
@@ -13,7 +9,3 @@ float getTime_ms(const T & tStart, const T & tEnd) {
 }
 
 std::vector<char> readFile(const char* filename);
-
-std::string getBinaryPath();
-
-std::map<std::string, std::string> parseCmdArguments(int argc, char ** argv);

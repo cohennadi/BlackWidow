@@ -1,10 +1,10 @@
 #include "Ultrasonic.h"
 #include "Defines.h"
+#include "utils.h"
 
 #include <SDL_opengl.h>
 #include <chrono>
 
-#include "ggwave-common.h"
 
 namespace ultrasonic
 {
