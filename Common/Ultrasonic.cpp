@@ -21,23 +21,31 @@ namespace ultrasonic
 
 	void Ultrasonic::run_logic()
 	{
-		static GGWave::CBWaveformOut cbQueueAudio = [&](const void* data, uint32_t nBytes) {
-			m_device_output.queue_audio(data, nBytes);
+		static GGWave::CBWaveformOut cbQueueAudio = [&](const void* data, uint32_t bytes) {
+			m_device_output.queue_audio(data, bytes);
 		};
 
-		static GGWave::CBWaveformInp cbWaveformInput = [&](void* data, uint32_t nMaxBytes) {
-			return m_device_input.dequeue_audio(data, nMaxBytes);
+		static GGWave::CBWaveformInp cbWaveformInput = [&](void* data, uint32_t max_bytes) {
+			return m_device_input.dequeue_audio(data, max_bytes);
 		};
 
-		if (m_ggwave_ptr->hasTxData() == false) {
+		if (m_ggwave_ptr->hasTxData()) {
+			m_device_output.pause();
+			m_device_input.pause();
+
+			m_ggwave_ptr->encode(cbQueueAudio);
+		} else {
 			m_device_output.unpause();
 
 			static auto tLastNoData = std::chrono::high_resolution_clock::now();
 			auto tNow = std::chrono::high_resolution_clock::now();
 
-			if (m_device_output.queued_audio_size() < m_ggwave_ptr->getSamplesPerFrame() * m_ggwave_ptr->getSampleSizeBytesOut()) {
+			if (m_device_output.queued_audio_size() >= m_ggwave_ptr->getSamplesPerFrame() * m_ggwave_ptr->getSampleSizeBytesOut()) {
+				tLastNoData = tNow;
+			}
+			else {
 				m_device_input.unpause();
-				
+
 				if (getTime_ms(tLastNoData, tNow) > 500.0f) {
 					m_ggwave_ptr->decode(cbWaveformInput);
 					if (m_device_input.queued_audio_size() > 32 * m_ggwave_ptr->getSamplesPerFrame() * m_ggwave_ptr->getSampleSizeBytesInp()) {
@@ -48,15 +56,6 @@ namespace ultrasonic
 					m_device_input.clear_queued_audio();
 				}
 			}
-			else {
-				tLastNoData = tNow;
-			}
-		}
-		else {
-			m_device_output.pause();
-			m_device_input.pause();
-
-			m_ggwave_ptr->encode(cbQueueAudio);
 		}
 	}
 
