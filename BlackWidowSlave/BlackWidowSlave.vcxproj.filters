@@ -15,7 +15,7 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="BlackWidowSlave.cpp">
+    <ClCompile Include="TestLister.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
   </ItemGroup>
