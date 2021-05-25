@@ -135,6 +135,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)external\ggwave\include;$(SolutionDir)external\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreadedDebug</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -157,6 +158,7 @@
       <ConformanceMode>true</ConformanceMode>
       <AdditionalIncludeDirectories>$(SolutionDir)external\ggwave\include;$(SolutionDir)external\SDL2-2.0.14\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -172,12 +174,16 @@
     </Lib>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="AudioDevice.cpp" />
     <ClCompile Include="ggwave-common.cpp" />
+    <ClCompile Include="SdlWrapper.cpp" />
     <ClCompile Include="Ultrasonic.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="AudioDevice.h" />
     <ClInclude Include="Defines.h" />
     <ClInclude Include="ggwave-common.h" />
+    <ClInclude Include="SdlWrapper.h" />
     <ClInclude Include="Ultrasonic.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

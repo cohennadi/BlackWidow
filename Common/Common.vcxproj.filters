@@ -7,6 +7,12 @@
     <ClCompile Include="Ultrasonic.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="AudioDevice.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="SdlWrapper.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="ggwave-common.h">
@@ -16,6 +22,12 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="Defines.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="AudioDevice.h">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="SdlWrapper.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>

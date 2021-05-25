@@ -1,9 +1,10 @@
 #pragma once
+#include "AudioDevice.h"
+#include "SdlWrapper.h"
 
-#include "ggwave/ggwave.h"
-
-#include <SDL.h>
+#include <ggwave/ggwave.h>
 #include <memory>
+
 
 namespace ultrasonic
 {
@@ -15,7 +16,7 @@ namespace ultrasonic
 		Ultrasonic();
 
 		// Dtor
-		~Ultrasonic();
+		~Ultrasonic() = default;
 
 		// Runs the ultrasonic logic.
 		void run_logic();
@@ -31,26 +32,24 @@ namespace ultrasonic
 		Ultrasonic& operator=(Ultrasonic&&) = delete;
 	private:
 
-		// initialise sdl.
-		static void init_sdl();
-
 		// initialise device input.
-		// param[out]	o_sample_format				The input device sample format.
-		// param[out]	o_sample_rate				The input device sample rate.
 		// param[in]	output_device_spec			The output device spec.
-		// return									The audio device id
-		static SDL_AudioDeviceID init_device_input(GGWave::SampleFormat &o_sample_format, int& o_sample_rate, const SDL_AudioSpec& output_device_spec);
+		// return									The audio device.
+		static AudioDevice init_device_input(const SDL_AudioSpec& output_device_spec);
 
 		// initialise device output.
-		// param[out]	o_sample_format				The output device sample format.
-		// param[out]	o_sample_rate				The output device sample rate.
-		// param[out]	o_output_device_spec		The output device spec.
-		// return									The audio device id
-		static SDL_AudioDeviceID init_device_output(GGWave::SampleFormat &o_sample_format, int& o_sample_rate, SDL_AudioSpec& o_output_device_spec);
+		// return									The audio device.
+		static AudioDevice init_device_output();
+
+		// Converts to ggwave sample format.
+		// param[in]	sdl_format					The sdl format to convert.
+		// return									The ggwave format.
+		static ggwave_SampleFormat convert_to_ggwave_sample_format(SDL_AudioFormat sdl_format);
 
 		// Members
-		SDL_AudioDeviceID m_device_id_input;
-		SDL_AudioDeviceID m_device_id_output;
+		SdlWrapper m_sdl;
+		AudioDevice m_device_output;
+		AudioDevice m_device_input;
 		std::shared_ptr<GGWave> m_ggwave_ptr;
 		
 	};
