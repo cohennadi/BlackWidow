@@ -1,8 +1,8 @@
 ﻿#include "TextBoxInput.h"
 
-std::string G_text_input;
+std::wstring G_text_input;
 
-TextBoxInput::TextBoxInput(HINSTANCE instance_handle, const std::string& window_class_name, const std::string& title)
+TextBoxInput::TextBoxInput(HINSTANCE instance_handle, const std::wstring& window_class_name, const std::wstring& title)
 {
 	register_class(instance_handle, window_class_name);
 	create_window(instance_handle, window_class_name, title);
@@ -21,18 +21,18 @@ void TextBoxInput::window_loop() const
 	}
 }
 
-std::string TextBoxInput::text_input() const
+std::wstring TextBoxInput::text_input() const
 {
 	return G_text_input;
 }
 
-void TextBoxInput::register_class(HINSTANCE instance_handle, const std::string& window_class_name)
+void TextBoxInput::register_class(HINSTANCE instance_handle, const std::wstring& window_class_name)
 {
-	constexpr LPCSTR NO_DEFUALT_MENU = nullptr;
+	constexpr LPCWSTR NO_DEFUALT_MENU = nullptr;
 	constexpr int NO_EXTRA_CLASS_MEMORY = 0;
 	constexpr int NO_EXTRA_WINDOW_MEMORY = 0;
 
-	WNDCLASSEXA window_class;
+	WNDCLASSEX window_class;
 
 	window_class.hInstance = instance_handle;
 	window_class.lpszClassName = window_class_name.c_str();
@@ -47,13 +47,13 @@ void TextBoxInput::register_class(HINSTANCE instance_handle, const std::string& 
 	window_class.cbWndExtra = NO_EXTRA_WINDOW_MEMORY;
 	window_class.hbrBackground = static_cast<HBRUSH>(GetStockObject(WHITE_BRUSH));
 
-	if (!RegisterClassExA(&window_class))
+	if (!RegisterClassEx(&window_class))
 	{
 		//todo: raise exception 
 	}
 }
 
-void TextBoxInput::create_window(HINSTANCE instance_handle, const std::string& window_class_name, const std::string& title)
+void TextBoxInput::create_window(HINSTANCE instance_handle, const std::wstring& window_class_name, const std::wstring& title)
 {
 	constexpr DWORD NO_EXTENDED_WINDOW_STYLE = 0;
 	constexpr int DEFAULT_X_POSITION = CW_USEDEFAULT;
@@ -64,7 +64,7 @@ void TextBoxInput::create_window(HINSTANCE instance_handle, const std::string& w
 	constexpr LPVOID NO_CREATION_PARAMS = nullptr;
 	constexpr int SHOW_WINDOW = SW_SHOW;
 
-	const HWND window_handle = CreateWindowExA(NO_EXTENDED_WINDOW_STYLE,
+	const HWND window_handle = CreateWindowEx(NO_EXTENDED_WINDOW_STYLE,
 											   window_class_name.c_str(),
 											   title.c_str(),
 											   WS_OVERLAPPEDWINDOW,
@@ -103,7 +103,7 @@ LRESULT TextBoxInput::window_logic(HWND hwnd, UINT message, WPARAM wParam, LPARA
 	constexpr int INSERT_WIDTH = 100;
 	constexpr int INSERT_HEIGHT = EDIT_HEIGHT;
 	constexpr LPVOID NO_CREATION_PARAMS = nullptr;
-	constexpr LPCSTR NO_TITLE = nullptr;
+	constexpr LPCWSTR NO_TITLE = nullptr;
 	constexpr int MAX_COUNT = 100;
 
 	switch (message)
@@ -112,37 +112,37 @@ LRESULT TextBoxInput::window_logic(HWND hwnd, UINT message, WPARAM wParam, LPARA
 		PostQuitMessage(0);
 		break;
 	case WM_CREATE:
-		CreateWindowA("edit",
-					  NO_TITLE,
-					  WS_CHILD | WS_VISIBLE | WS_BORDER,
-					  EDIT_X,
-					  EDIT_Y,
-					  EDIT_WIDTH,
-					  EDIT_HEIGHT,
-					  hwnd,
-					  reinterpret_cast<HMENU>(EDIT_TEXT_BOX),
-					  GetModuleHandle(NULL),
-					  NO_CREATION_PARAMS);
-		CreateWindowA("button",
-					  "Insert",
-					  WS_CHILD | WS_VISIBLE,
-					  INSERT_X,
-					  INSERT_Y,
-					  INSERT_WIDTH,
-					  INSERT_HEIGHT,
-					  hwnd,
-					  reinterpret_cast<HMENU>(ENTER_KEY),
-					  GetModuleHandle(NULL),
-					  NO_CREATION_PARAMS);
+		CreateWindow(L"edit",
+					 NO_TITLE,
+					 WS_CHILD | WS_VISIBLE | WS_BORDER,
+					 EDIT_X,
+					 EDIT_Y,
+					 EDIT_WIDTH,
+					 EDIT_HEIGHT,
+					 hwnd,
+					 reinterpret_cast<HMENU>(EDIT_TEXT_BOX),
+					 GetModuleHandle(NULL),
+					 NO_CREATION_PARAMS);
+		CreateWindow(L"button",
+					 L"Insert",
+					 WS_CHILD | WS_VISIBLE,
+					 INSERT_X,
+					 INSERT_Y,
+					 INSERT_WIDTH,
+					 INSERT_HEIGHT,
+					 hwnd,
+					 reinterpret_cast<HMENU>(ENTER_KEY),
+					 GetModuleHandle(NULL),
+					 NO_CREATION_PARAMS);
 		break;
 	case WM_COMMAND:
 		switch (LOWORD(wParam))
 		{
 		case ENTER_KEY:
 		{
-			std::string input;
+			std::wstring input;
 			input.resize(MAX_COUNT);
-			GetWindowTextA(GetDlgItem(hwnd, EDIT_TEXT_BOX), const_cast<char*>(input.c_str()), MAX_COUNT);
+			GetWindowText(GetDlgItem(hwnd, EDIT_TEXT_BOX), const_cast<wchar_t*>(input.c_str()), MAX_COUNT);
 			G_text_input = std::move(input);
 			PostQuitMessage(0);
 		}

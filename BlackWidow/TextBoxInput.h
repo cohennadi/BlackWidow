@@ -1,6 +1,5 @@
 ﻿#pragma once
 
-
 #include <string>
 #include <Windows.h>
 
@@ -12,7 +11,7 @@ public:
 	// param[in]	instance_handle			handle to application instance.
 	// param[in]	window_class_name		name of window class.
 	// param[in]	title					the window title.
-	TextBoxInput(HINSTANCE instance_handle, const std::string& window_class_name, const std::string& title);
+	TextBoxInput(HINSTANCE instance_handle, const std::wstring& window_class_name, const std::wstring& title);
 
 	// dtor
 	~TextBoxInput() = default;
@@ -22,7 +21,7 @@ public:
 
 	// The text input.
 	// return								the text input.
-	[[nodiscard]] std::string text_input() const;
+	[[nodiscard]] std::wstring text_input() const;
 
 	// Deleted functions
 	TextBoxInput(const TextBoxInput&) = delete;
@@ -35,13 +34,13 @@ private:
 	// Register window class.
 	// param[in]	instance_handle			handle to application instance.
 	// param[in]	window_class_name		name of window class.
-	static void register_class(HINSTANCE instance_handle, const std::string& window_class_name);
+	static void register_class(HINSTANCE instance_handle, const std::wstring& window_class_name);
 
 	// Create window.
 	// param[in]	instance_handle			handle to application instance.
 	// param[in]	window_class_name		name of window class.
 	// param[in]	title					the window title.
-	static void create_window(HINSTANCE instance_handle, const std::string& window_class_name, const std::string& title);
+	static void create_window(HINSTANCE instance_handle, const std::wstring& window_class_name, const std::wstring& title);
 
 	// Callback for register class.
 	static LRESULT CALLBACK window_logic(HWND hwnd, UINT message, WPARAM wParam, LPARAM lParam);

