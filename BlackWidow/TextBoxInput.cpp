@@ -49,7 +49,7 @@ void TextBoxInput::register_class(HINSTANCE instance_handle, const std::wstring&
 
 	if (!RegisterClassEx(&window_class))
 	{
-		//todo: raise exception 
+		throw std::exception("Error register class");
 	}
 }
 
@@ -79,7 +79,7 @@ void TextBoxInput::create_window(HINSTANCE instance_handle, const std::wstring& 
 
 	if (!window_handle)
 	{
-		// todo: raise exception
+		throw std::exception("Error creating window");
 	}
 
 	ShowWindow(window_handle, SHOW_WINDOW);

@@ -4,6 +4,7 @@
 #include "Defines.h"
 
 #include <cassert>
+#include <exception>
 
 using namespace ultrasonic;
 
@@ -84,7 +85,8 @@ std::tuple<SDL_AudioDeviceID, SDL_AudioSpec> AudioDevice::init_audio_device(cons
 	if (!input_device_id) {
 		const std::string log_message = std::string("Couldn't open an audio device: ") + SDL_GetError();
 		LOG(log_message);
-		//throw; // TODO: add exceptions class
+
+		throw std::exception("Error opening audio device");
 	}
 
 	return { input_device_id, obtained_spec };

